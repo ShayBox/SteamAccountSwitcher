@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSystemTrayIcon>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,13 +17,13 @@ public:
     ~MainWindow();
 
 private slots:
+    void createTrayIcon();
     void on_loginButton_clicked();
-
     void on_removeButton_clicked();
-
     void on_addButton_clicked();
 
 private:
     Ui::MainWindow *ui;
+    QSystemTrayIcon *trayIcon;
 };
 #endif // MAINWINDOW_H

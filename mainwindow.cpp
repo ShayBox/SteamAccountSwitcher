@@ -3,10 +3,30 @@
 
 #include <QDir>
 #include <QFile>
+#include <QMenu>
 #include <QProcess>
 #include <QSettings>
 #include <QThread>
-#include <QDebug>
+
+void MainWindow::createTrayIcon()
+{
+    QAction *showAction = new QAction(tr("&Show"), this);
+    connect(showAction, &QAction::triggered, this, &QWidget::showNormal);
+
+    QAction *quitAction = new QAction(tr("&Quit"), this);
+    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+
+    QMenu *trayIconMenu = new QMenu(this);
+    trayIconMenu->addAction(showAction);
+    trayIconMenu->addAction(quitAction);
+
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayIconMenu);
+
+    connect(trayIcon, &QSystemTrayIcon::activated, this, &QWidget::showNormal);
+    trayIcon->setIcon(QIcon(":/tray.ico"));
+    trayIcon->show();
+}
 
 QStringList LoadSettings()
 {
@@ -18,14 +38,20 @@ QStringList LoadSettings()
     return usernames;
 }
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+// Setup UI, create tray icon, load settings
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
+    createTrayIcon();
+
     QStringList usernames = LoadSettings();
     ui->comboBox->addItems(usernames);
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 
 void SaveSettings(QComboBox* comboBox)
@@ -42,13 +68,7 @@ void SaveSettings(QComboBox* comboBox)
     setting.endGroup();
 }
 
-MainWindow::~MainWindow()
-{
-    SaveSettings(ui->comboBox);
-
-    delete ui;
-}
-
+// Kill steam, change AutoLoginUser, start steam
 void MainWindow::on_loginButton_clicked()
 {
     system("killall --quiet --wait steam");
@@ -70,19 +90,25 @@ void MainWindow::on_loginButton_clicked()
     process.setStandardErrorFile(QProcess::nullDevice());
     process.startDetached();
 
-    exit(0);
+    MainWindow::close();
 }
 
+// Remove item from combobox and save
 void MainWindow::on_removeButton_clicked()
 {
     int index = ui->comboBox->currentIndex();
     ui->comboBox->removeItem(index);
+
+    SaveSettings(ui->comboBox);
 }
 
+// Add item to combobox and save
 void MainWindow::on_addButton_clicked()
 {
     QString username = ui->lineEdit->displayText().toLower();
-    ui->lineEdit->setText("");
     ui->comboBox->addItem(username);
     ui->comboBox->setCurrentText(username);
+    ui->lineEdit->setText("");
+
+    SaveSettings(ui->comboBox);
 }
