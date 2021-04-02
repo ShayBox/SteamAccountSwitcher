@@ -17,7 +17,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void createTrayIcon();
     void on_loginButton_clicked();
     void on_removeButton_clicked();
     void on_addButton_clicked();
@@ -25,5 +24,9 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QSystemTrayIcon *trayIcon;
+    QStringList usernames;
+    void loadSettings();
+    void saveSettings();
+    void setupTray();
 };
 #endif // MAINWINDOW_H

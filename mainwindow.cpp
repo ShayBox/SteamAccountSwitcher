@@ -8,12 +8,53 @@
 #include <QSettings>
 #include <QThread>
 
-void MainWindow::createTrayIcon()
+#define SETTINGS_START {
+void MainWindow::loadSettings()
 {
-    QAction *showAction = new QAction(tr("&Show"), this);
+    QSettings setting("SteamAutoLogin", "settings");
+    setting.beginGroup("MainWindow");
+    QStringList usernames = setting.value("usernames").value<QStringList>();
+    bool hideOnStart = setting.value("hide-on-start", false).toBool();
+    setting.endGroup();
+
+    ui->comboBox->addItems(usernames);
+    if (hideOnStart) this->hide();
+}
+
+void MainWindow::saveSettings()
+{
+    QStringList usernames;
+    for (int i = 0; i < ui->comboBox->count(); i++) {
+        QString username = ui->comboBox->itemText(i);
+        usernames.append(username);
+    }
+
+    QSettings setting("SteamAutoLogin", "settings");
+    setting.beginGroup("MainWindow");
+    setting.setValue("usernames", usernames);
+    setting.endGroup();
+}
+#define SETTINGS_END }
+
+#define SETUP_START {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    setupTray();
+    loadSettings();
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::setupTray()
+{
+    QAction *showAction = new QAction("Show", this);
     connect(showAction, &QAction::triggered, this, &QWidget::showNormal);
 
-    QAction *quitAction = new QAction(tr("&Quit"), this);
+    QAction *quitAction = new QAction("Quit", this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 
     QMenu *trayIconMenu = new QMenu(this);
@@ -25,50 +66,12 @@ void MainWindow::createTrayIcon()
 
     connect(trayIcon, &QSystemTrayIcon::activated, this, &QWidget::showNormal);
     trayIcon->setIcon(QIcon(":/tray.ico"));
+    trayIcon->setToolTip("SteamAutoLogin");
     trayIcon->show();
 }
+#define SETUP_END }
 
-QStringList LoadSettings()
-{
-    QSettings setting("SteamAutoLogin", "settings");
-    setting.beginGroup("MainWindow");
-    QStringList usernames = setting.value("usernames").value<QStringList>();
-    setting.endGroup();
-
-    return usernames;
-}
-
-// Setup UI, create tray icon, load settings
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-
-    createTrayIcon();
-
-    QStringList usernames = LoadSettings();
-    ui->comboBox->addItems(usernames);
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
-void SaveSettings(QComboBox* comboBox)
-{
-    QStringList usernames;
-    for (int i = 0; i < comboBox->count(); i++) {
-        QString username = comboBox->itemText(i);
-        usernames.append(username);
-    }
-
-    QSettings setting("SteamAutoLogin", "settings");
-    setting.beginGroup("MainWindow");
-    setting.setValue("usernames", usernames);
-    setting.endGroup();
-}
-
-// Kill steam, change AutoLoginUser, start steam
+#define FUNCTIONS_START {
 void MainWindow::on_loginButton_clicked()
 {
     system("killall --quiet --wait steam");
@@ -93,22 +96,19 @@ void MainWindow::on_loginButton_clicked()
     MainWindow::close();
 }
 
-// Remove item from combobox and save
 void MainWindow::on_removeButton_clicked()
 {
     int index = ui->comboBox->currentIndex();
     ui->comboBox->removeItem(index);
-
-    SaveSettings(ui->comboBox);
+    saveSettings();
 }
 
-// Add item to combobox and save
 void MainWindow::on_addButton_clicked()
 {
     QString username = ui->lineEdit->displayText().toLower();
     ui->comboBox->addItem(username);
     ui->comboBox->setCurrentText(username);
     ui->lineEdit->setText("");
-
-    SaveSettings(ui->comboBox);
+    saveSettings();
 }
+#define FUNCTIONS_END }
