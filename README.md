@@ -1,8 +1,26 @@
-# SteamAutoLogin
+# SteamAccountSwitcher
 
-This is a Qt Steam account switcher for Linux
+Qt Steam account switcher
 
 ![](screenshot.png)
 
-[Download](https://github.com/ShayBox/SteamAutoLogin/releases/latest)
-[AUR](https://aur.archlinux.org/packages/steamautologin-bin)
+[AUR](https://aur.archlinux.org/packages/steamaccountswitcher-git)
+
+#### Build & Install
+```
+git clone https://github.com/ShayBox/SteamAccountSwitcher.git
+cd SteamAccountSwitcher
+poetry build
+pip install --user dist/*.tar.gz
+
+steamswitcher
+```
+
+#### Development
+```
+git clone https://github.com/ShayBox/SteamAccountSwitcher.git
+cd SteamAccountSwitcher
+poetry env use <python3 executable>
+
+poetry run steamswitcher-dev
+```
