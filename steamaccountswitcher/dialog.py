@@ -36,6 +36,21 @@ class Dialog(QDialog, Ui_Dialog):
         if icon:
             self.setWindowIcon(icon)
 
+    def populate_accounts(self) -> None:
+        # Clear accounts in-case of a cancel repopulation
+        self.accountsBox.clear()
+
+        # Populate accounts from settings
+        accounts = self.settings.value("accounts", [])
+        accounts = accounts if isinstance(accounts, list) else []
+        for account in accounts:
+            logging.info(f"Adding account {account}")
+            self.accountsBox.addItem(account)
+
+        # Select the previously selected account
+        account = self.settings.value("account", "")
+        self.accountsBox.setCurrentText(account)
+
     def init_tray(self) -> None:
         self.tray = QSystemTrayIcon(self.windowIcon(), self)
         self.menu = QMenu()
@@ -57,37 +72,25 @@ class Dialog(QDialog, Ui_Dialog):
         self.tray.setContextMenu(self.menu)
         self.tray.setToolTip("Steam Account Switcher")
 
-    def populate_accounts(self) -> None:
-        self.accountsBox.clear()
-
-        accounts = self.settings.value("accounts", [])
-        accounts = accounts if isinstance(accounts, list) else []
-        for account in accounts:
-            logging.info(f"Adding account {account}")
-            self.accountsBox.addItem(account)
-
-        account = self.settings.value("account", "")
-        self.accountsBox.setCurrentText(account)
-
     def connect_buttons(self) -> None:
-        self.addButton.clicked.connect(self.add_account)
-        self.removeButton.clicked.connect(self.remove_account)
-        self.loginButton.clicked.connect(self.login)
+        self.addButton.clicked.connect(self.action_add_account)
+        self.removeButton.clicked.connect(self.action_remove_account)
+        self.loginButton.clicked.connect(self.action_login_account)
 
-    def add_account(self) -> None:
+    def action_add_account(self) -> None:
         account = self.accountEdit.text()
         if account:
             logging.info(f"Adding account {account}")
             self.accountsBox.addItem(account)
             self.accountEdit.clear()
 
-    def remove_account(self) -> None:
+    def action_remove_account(self) -> None:
         account = self.accountsBox.currentText()
         if account:
             logging.info(f"Removing account {account}")
             self.accountsBox.removeItem(self.accountsBox.currentIndex())
 
-    def login(self) -> None:
+    def action_login_account(self) -> None:
         logging.info("Logging in")
 
         logging.info("Killing steam")
@@ -117,18 +120,14 @@ class Dialog(QDialog, Ui_Dialog):
 
     def accept(self) -> None:
         logging.info("Saving accounts")
-
         self.settings.setValue(
             "accounts",
             [self.accountsBox.itemText(i) for i in range(self.accountsBox.count())],
         )
         self.settings.setValue("account", self.accountsBox.currentText())
-
         self.hide()
 
     def reject(self) -> None:
         logging.info("Cancelling, repopulating accounts")
-
         self.populate_accounts()
-
         self.hide()

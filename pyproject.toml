@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "SteamAccountSwitcher"
-version = "0.2.0"
-description = "Qt Steam account switcher"
+version = "0.2.1"
+description = "Qt Steam account switcher for linux"
 authors = ["Shayne Hartford <shaybox@shaybox.com>"]
 
 [tool.poetry.dependencies]

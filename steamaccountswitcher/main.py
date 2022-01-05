@@ -10,16 +10,20 @@ logging.basicConfig(
 
 
 def main() -> None:
+    logging.info("Forking process to run in background")
     subprocess.Popen(["steamswitcher-gui"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def dev() -> None:
+    logging.info("Converting .ui files to .py files")
     os.chdir("steamaccountswitcher/ui")
     for path in Path().glob("*.ui"):
         ui = path.name
         py = path.name.replace(".ui", ".py")
         logging.info(f"Generating {py} from {ui}")
         os.system(f"pyside6-uic {ui} -o {py}")
+
+    logging.info("Running main()")
     gui()
 
 
@@ -29,7 +33,7 @@ def gui() -> None:
 
     logging.info("Initializing QApplication and QDialog")
     app = QApplication()
-    dialog = Dialog()
+    Dialog()
 
     logging.info("Executing QApplication")
     sys.exit(app.exec())
