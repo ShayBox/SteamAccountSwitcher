@@ -1,24 +1,29 @@
 [tool.poetry]
 name = "SteamAccountSwitcher"
-version = "0.2.1"
+version = "0.3.0"
 description = "Qt Steam account switcher for linux"
 authors = ["Shayne Hartford <shaybox@shaybox.com>"]
 
 [tool.poetry.dependencies]
-PySide6 = "^6.2.2"
-python = ">=3.6,<3.11"
+click = "^8.0.4"
+PyQt5 = { version = "^5.15.6", optional = true }
+PyQt6 = { version = "^6.2.3", optional = true }
+python = ">=3.6.2,<3.11"
+QtPy = "^2.0.1"
 
 [tool.poetry.dev-dependencies]
-black = { version = "^21.12b0", allow-prereleases = true }
+black = "^22.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.poetry.extras]
+"PyQt5" = ["PyQt5"]
+"PyQt6" = ["PyQt6"]
+
 [tool.poetry.scripts]
 steamswitcher = "steamaccountswitcher.main:main"
-steamswitcher-gui = "steamaccountswitcher.main:gui"
-steamswitcher-dev = "steamaccountswitcher.main:dev"
 
 [tool.black]
 line-length = 120

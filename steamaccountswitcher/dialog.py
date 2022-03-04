@@ -1,16 +1,22 @@
-from PySide6.QtCore import QSettings
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QDialog, QMenu, QSystemTrayIcon
-from steamaccountswitcher.ui.dialog import Ui_Dialog
-import logging, os, re, subprocess
+# Built-in modules
+import logging
+import os
+import re
+import subprocess
+
+# Third-party modules
+from qtpy.QtCore import QSettings
+from qtpy.QtGui import QIcon
+from qtpy.QtWidgets import QDialog, QMenu, QSystemTrayIcon
+from qtpy.uic import loadUi
 
 
-class Dialog(QDialog, Ui_Dialog):
+class MainWindow(QDialog):
     def __init__(self) -> None:
         super().__init__()
 
         logging.info("Setting up Dialog UI")
-        self.setupUi(self)
+        self.ui = loadUi("steamaccountswitcher/dialog.ui", self)
 
         logging.info("Initializing QSettings")
         self.settings = QSettings("ShayBox", "SteamAccountSwitcher")
@@ -31,7 +37,7 @@ class Dialog(QDialog, Ui_Dialog):
         self.tray.show()
 
     def set_window_icon(self) -> None:
-        icon = self.settings.value("icon", None)
+        icon = self.settings.value("icon", "steam")
         icon = QIcon(icon) if isinstance(icon, QIcon) else QIcon.fromTheme(icon)
         if icon:
             self.setWindowIcon(icon)

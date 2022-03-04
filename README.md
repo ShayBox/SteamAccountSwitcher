@@ -1,31 +1,39 @@
 # SteamAccountSwitcher
 
-Qt Steam account switcher for linux
+Qt 5/6 Steam account switcher for linux
 
-![](screenshot.png)
+![Screenshot](screenshot.png)
 
 [AUR](https://aur.archlinux.org/packages/steamaccountswitcher-git)
 
-### Build & Install
-`killall` is a required runtime dependency
+#### Installation
+Requirements:
+- [Python] 3.7 or later
+- PyQt5 or PyQt6
 ```
-git clone https://github.com/ShayBox/SteamAccountSwitcher.git
-cd SteamAccountSwitcher
-poetry build
-pip install --user dist/*.tar.gz
+$ pip install --user pyqt5
+$ pip install --user git+https://github.com/shaybox/steamaccountswitcher.git
 
-steamswitcher
+$ steamswitcher
 ```
 
 ### Development
-`poetry` is a required build dependency (build tool)
+Requirements:
+- [Python] 3.7 or later
+- [Poetry] via pip
+- [PyQt5] or [PyQt6]
 ```
 git clone https://github.com/ShayBox/SteamAccountSwitcher.git
 cd SteamAccountSwitcher
 poetry env use <python3 executable>
 
-poetry run steamswitcher-dev
+$ poetry run steamswitcher
 ```
+
+#### Usage
+There's icon and desktop entry files in the `data` directory.  
+Run the command `steamswitcher -b` to start the tray icon.  
+Run the command `steamswitcher --help` to see the command line options.
 
 ### Configuration
 SteamAccountSwitcher uses [QSettings](https://doc.qt.io/qt-6/qsettings.html#locations-where-application-settings-are-stored)  
@@ -47,3 +55,8 @@ steam=steam
 `kill` is the command used to kill steam  
 `registry` is the location to steams registry.vdf, must be a full path  
 `steam` is the steam executable that is launched  
+
+[Python]: https://python.org
+[Poetry]: https://python-poetry.org
+[PyQt5]: https://pypi.org/project/PyQt5
+[PyQt6]: https://pypi.org/project/PyQt6
