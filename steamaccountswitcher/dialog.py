@@ -16,7 +16,7 @@ class MainWindow(QDialog):
         super().__init__()
 
         logging.info("Setting up Dialog UI")
-        self.ui = loadUi("steamaccountswitcher/dialog.ui", self)
+        self.ui = loadUi(os.path.dirname(__file__) + "/dialog.ui", self)
 
         logging.info("Initializing QSettings")
         self.settings = QSettings("ShayBox", "SteamAccountSwitcher")
